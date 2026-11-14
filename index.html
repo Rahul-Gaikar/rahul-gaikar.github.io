@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rahul Gaikar: product designer who builds</title>
+<meta name="description" content="Rahul Gaikar is a product designer who builds. Apps, experiments, templates, and motion work, all in one place.">
+<meta property="og:title" content="Rahul Gaikar: product designer who builds">
+<meta property="og:description" content="Apps, experiments, templates, and motion work, all in one place.">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:creator" content="@Rahul_gaikarr">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..700&family=Newsreader:ital,opsz,wght@0,6..72,400..500;1,6..72,400&display=swap" rel="stylesheet">
+<style>
+  /* ---------- Design tokens: change the look from here ---------- */
+  :root {
+    --bg: #F4F5F7;
+    --ink: #14161A;
+    --muted: #5E6470;
+    --line: #DCDFE6;
+    --accent: #2B44FF;
+    --link: #2B44FF;
+    --on-accent: #FFFFFF;
+    --shipped: #1B8F4D;
+    --building: #C77A00;
+
+    --display: "Bricolage Grotesque", "Helvetica Neue", Arial, system-ui, sans-serif;
+    --body: "Newsreader", Georgia, "Times New Roman", serif;
+
+    --col: 40rem;
+    --ease: cubic-bezier(.2, .7, .2, 1);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #12151C;
+      --ink: #ECEEF2;
+      --muted: #9AA1AE;
+      --line: #272C38;
+      --link: #9AA8FF;
+      --shipped: #4CC985;
+      --building: #F0B34A;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #12151C;
+    --ink: #ECEEF2;
+    --muted: #9AA1AE;
+    --line: #272C38;
+    --link: #9AA8FF;
+    --shipped: #4CC985;
+    --building: #F0B34A;
+    color-scheme: dark;
+  }
+
+  /* ---------- Base ---------- */
+  *, *::before, *::after { box-sizing: border-box; }
+  :root {
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 1.1875rem;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  a { color: var(--link); text-decoration-thickness: 1px; text-underline-offset: 0.18em; }
+  a:hover { text-decoration-thickness: 2px; }
+  a:focus-visible, button:focus-visible {
+    outline: 2px solid var(--link);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+  p { margin: 0; }
+
+  .page {
+    max-width: var(--col);
+    margin: 0 auto;
+    padding: 1.5rem 1.25rem 3rem;
+  }
+
+  /* ---------- Top bar ---------- */
+  .top {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    font-family: var(--display);
+    font-size: 0.9375rem;
+  }
+  .top .name { font-weight: 600; letter-spacing: -0.01em; }
+  .top nav { display: flex; gap: 1.25rem; }
+  .top nav a { color: var(--muted); text-decoration: none; }
+  .top nav a:hover { color: var(--ink); text-decoration: underline; }
+
+  /* ---------- Hero ---------- */
+  .hero { padding: 4.5rem 0 3.5rem; }
+  h1 {
+    margin: 0 0 1.5rem;
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: clamp(2.5rem, 9vw, 4rem);
+    line-height: 1.02;
+    letter-spacing: -0.035em;
+    text-wrap: balance;
+  }
+  .intro { max-width: 34rem; }
+  .now {
+    display: flex;
+    align-items: baseline;
+    gap: 0.625rem;
+    margin-top: 1.75rem;
+    font-family: var(--display);
+    font-size: 0.9375rem;
+    color: var(--muted);
+  }
+  .now .dot {
+    flex: none;
+    width: 0.5rem; height: 0.5rem;
+    border-radius: 50%;
+    background: var(--building);
+    transform: translateY(-0.05em);
+    animation: pulse 2.4s ease-in-out infinite;
+  }
+  @keyframes pulse { 50% { opacity: 0.35; } }
+
+  /* ---------- Sections ---------- */
+  section { padding: 2.5rem 0; border-top: 1px solid var(--line); }
+  h2 {
+    margin: 0 0 1.25rem;
+    font-family: var(--display);
+    font-weight: 500;
+    font-size: 0.9375rem;
+    color: var(--muted);
+    letter-spacing: 0;
+  }
+
+  /* ---------- Project list ---------- */
+  .projects { list-style: none; margin: 0; padding: 0; }
+  .project { padding: 1.25rem 0; border-top: 1px solid var(--line); }
+  .project:first-child { border-top: 0; padding-top: 0; }
+  .project:last-child { padding-bottom: 0; }
+  .project-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .project h3 {
+    margin: 0;
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 1.375rem;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+  .status {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4375rem;
+    font-family: var(--display);
+    font-size: 0.875rem;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .status::before {
+    content: "";
+    width: 0.5rem; height: 0.5rem;
+    border-radius: 50%;
+    background: var(--muted);
+  }
+  .status[data-status="shipped"]::before,
+  .status[data-status="live"]::before { background: var(--shipped); }
+  .status[data-status="building"]::before { background: var(--building); animation: pulse 2.4s ease-in-out infinite; }
+  .status[data-status="next"]::before { background: transparent; box-shadow: inset 0 0 0 1.5px var(--muted); }
+  .project p { margin-top: 0.5rem; max-width: 34rem; }
+  .project .note {
+    margin-top: 0.5rem;
+    font-family: var(--display);
+    font-size: 0.875rem;
+    color: var(--muted);
+  }
+  .project .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1.25rem;
+    margin-top: 0.75rem;
+    font-family: var(--display);
+    font-size: 0.9375rem;
+    font-weight: 500;
+  }
+
+  /* ---------- Hire block: the one loud thing on the page ---------- */
+  .hire {
+    margin: 0.5rem 0 2.5rem;
+    padding: 2.25rem 1.75rem;
+    border: 0;
+    border-radius: 1.25rem;
+    background: var(--accent);
+    color: var(--on-accent);
+  }
+  .hire h2 { color: var(--on-accent); opacity: 0.8; }
+  .hire .pitch {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: clamp(1.75rem, 6vw, 2.5rem);
+    line-height: 1.08;
+    letter-spacing: -0.03em;
+    text-wrap: balance;
+    margin-bottom: 1rem;
+  }
+  .hire p { max-width: 32rem; }
+  .hire .actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1.5rem;
+    margin-top: 1.75rem;
+    font-family: var(--display);
+    font-size: 1rem;
+    font-weight: 500;
+  }
+  .hire .btn {
+    display: inline-block;
+    padding: 0.75rem 1.25rem;
+    border-radius: 999px;
+    background: var(--on-accent);
+    color: var(--accent);
+    text-decoration: none;
+    transition: transform 0.15s var(--ease);
+  }
+  .hire .btn:hover { transform: translateY(-1px); }
+  .hire a:not(.btn) { color: var(--on-accent); }
+  .hire a:focus-visible { outline-color: var(--on-accent); }
+
+  /* ---------- Footer ---------- */
+  footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.5rem 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line);
+    font-family: var(--display);
+    font-size: 0.875rem;
+    color: var(--muted);
+  }
+
+  /* ---------- One load moment, hero only ---------- */
+  @media (prefers-reduced-motion: no-preference) {
+    .hero > * { opacity: 0; transform: translateY(8px); animation: rise 0.6s var(--ease) forwards; }
+    .hero > :nth-child(2) { animation-delay: 0.08s; }
+    .hero > :nth-child(3) { animation-delay: 0.16s; }
+    @keyframes rise { to { opacity: 1; transform: none; } }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .now .dot, .status::before { animation: none !important; }
+    .hire .btn { transition: none; }
+  }
+
+  @media (min-width: 40rem) {
+    .page { padding-top: 2.5rem; }
+    .hero { padding: 6rem 0 4.5rem; }
+    .hire { padding: 3rem 2.5rem; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="top">
+    <span class="name">Rahul Gaikar</span>
+    <nav aria-label="Links">
+      <a href="https://x.com/Rahul_gaikarr">X</a>
+      <a href="https://github.com/Rahul-Gaikar">GitHub</a>
+      <a href="https://motionbyrahul.framer.website/">Motion work</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="hero">
+      <h1>I design products, then I build them.</h1>
+      <p class="intro" id="intro"></p>
+      <p class="now"><span class="dot" aria-hidden="true"></span><span id="now"></span></p>
+    </div>
+
+    <section aria-labelledby="built">
+      <h2 id="built">Things I’ve built</h2>
+      <ul class="projects" id="projects"></ul>
+    </section>
+
+    <section aria-labelledby="before">
+      <h2 id="before">Before this</h2>
+      <p id="background"></p>
+    </section>
+
+    <section class="hire" aria-labelledby="hire">
+      <h2 id="hire">Motion for hire</h2>
+      <p class="pitch">Motion that makes products feel alive.</p>
+      <p>I come from product design, so I know what a transition is for, not just how to make it move. Recent motion work for Akirolabs, Chatlabs, and Actalyst.</p>
+      <div class="actions">
+        <a class="btn" href="https://motionbyrahul.framer.website/contact-me">Start a project</a>
+        <a href="https://motionbyrahul.framer.website/#work">See the motion work</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span>Based in India · Remote</span>
+    <span>Updated <span id="updated"></span></span>
+  </footer>
+
+</div>
+
+<script>
+/* =====================================================================
+   SITE CONTENT
+   Everything the page says lives here. To update the site, edit this
+   block only. Status can be: "shipped", "live", "building", "next".
+   ===================================================================== */
+const SITE = {
+  updated: "14 Nov 2026",
+
+  intro: "I’m Rahul, a product designer who also builds. Two years of interaction and motion work, and now real apps made with AI-assisted coding. Everything I ship ends up here.",
+
+  now: "Right now: shipping this site and posting the process on X.",
+
+  projects: [
+    {
+      name: "Hourglass",
+      status: "shipped",
+      statusLabel: "Shipped",
+      text: "A focus timer built around one gesture. Flip your phone face-down to start, watch the sand fall, flip it back for a break. Android, fully offline, no account.",
+      note: "Built with AI-assisted coding. v2 is planned: a 3D hourglass, haptics, and streaks.",
+      links: [
+        { label: "Download the APK", url: "https://github.com/Rahul-Gaikar/Hourglass/releases/download/v1.0/app-debug.apk" },
+        { label: "View on GitHub", url: "https://github.com/Rahul-Gaikar/Hourglass" }
+      ]
+    },
+    {
+      name: "Orbito 3D",
+      status: "live",
+      statusLabel: "Live",
+      text: "A two-player strategy board game in 3D, inspired by Orbito, where the board shifts under your pieces. Play against a bot or a friend online.",
+      note: "Built with Gemini in Google AI Studio.",
+      links: [
+        { label: "Play it", url: "https://orbito-3d-board-game.ai.studio" }
+      ]
+    },
+    {
+      name: "Bucket List",
+      status: "next",
+      statusLabel: "Up next",
+      text: "A Notion template. Nothing to show yet.",
+      note: "",
+      links: []
+    }
+  ],
+
+  background: "I spent two years at Port, a messaging app that has since shut down. I designed its motion system from scratch: transition timing, easing curves, and the logic for which motion belonged where. I also designed and built its website in Framer."
+};
+
+/* ---------- Rendering: no need to touch this for content updates ---------- */
+(function () {
+  const $ = (id) => document.getElementById(id);
+  const el = (tag, cls, text) => {
+    const n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text) n.textContent = text;
+    return n;
+  };
+
+  $("intro").textContent = SITE.intro;
+  $("now").textContent = SITE.now;
+  $("background").textContent = SITE.background;
+  $("updated").textContent = SITE.updated;
+
+  const list = $("projects");
+  SITE.projects.forEach((p) => {
+    const li = el("li", "project");
+
+    const head = el("div", "project-head");
+    head.appendChild(el("h3", "", p.name));
+    const status = el("span", "status", p.statusLabel);
+    status.dataset.status = p.status;
+    head.appendChild(status);
+    li.appendChild(head);
+
+    if (p.text) li.appendChild(el("p", "", p.text));
+    if (p.note) li.appendChild(el("p", "note", p.note));
+
+    if (p.links && p.links.length) {
+      const links = el("div", "links");
+      p.links.forEach((l) => {
+        const a = el("a", "", l.label);
+        a.href = l.url;
+        links.appendChild(a);
+      });
+      li.appendChild(links);
+    }
+    list.appendChild(li);
+  });
+})();
+</script>
+</body>
+</html>
