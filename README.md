@@ -1,4 +1,4 @@
-# rahul-gaikar.github.io
+# Rahul Builds
 
 Rahul Gaikar: product designer who builds. Live at https://rahul-gaikar.github.io
 
