@@ -84,6 +84,10 @@
     border-radius: 4px;
   }
   p { margin: 0; }
+  .sr-only {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+  }
 
   .page {
     max-width: var(--col);
@@ -247,6 +251,48 @@
   .hire a:not(.btn) { color: var(--on-accent); }
   .hire a:focus-visible { outline-color: var(--on-accent); }
 
+  /* ---------- Say hello ---------- */
+  .hello { padding-bottom: 3rem; }
+  .hello h2 { margin-bottom: 0.5rem; }
+  .hello .lead {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: clamp(1.75rem, 6vw, 2.25rem);
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    margin-bottom: 0.75rem;
+  }
+  .hello p { max-width: 32rem; }
+  .email-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1rem;
+    margin-top: 1.5rem;
+  }
+  .email {
+    font-family: var(--display);
+    font-weight: 500;
+    font-size: clamp(1.125rem, 4.5vw, 1.375rem);
+    letter-spacing: -0.01em;
+    word-break: break-all;
+  }
+  .copy {
+    appearance: none;
+    flex: none;
+    min-width: 5.5rem;
+    padding: 0.5rem 0.875rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--ink);
+    font: 500 0.875rem/1 var(--display);
+    cursor: pointer;
+    transition: border-color 0.15s var(--ease), background-color 0.15s var(--ease);
+  }
+  .copy:hover { border-color: var(--muted); }
+  .copy[data-copied] { border-color: var(--shipped); color: var(--shipped); }
+
   /* ---------- Footer ---------- */
   footer {
     display: flex;
@@ -269,7 +315,7 @@
   }
   @media (prefers-reduced-motion: reduce) {
     .now .dot, .status::before { animation: none !important; }
-    .hire .btn { transition: none; }
+    .hire .btn, .copy { transition: none; }
   }
 
   @media (min-width: 40rem) {
@@ -317,6 +363,17 @@
         <a href="https://motionbyrahul.framer.website/#work">See the motion work</a>
       </div>
     </section>
+
+    <section class="hello" id="hello" aria-labelledby="hello-title" hidden>
+      <h2 id="hello-title">Say hello</h2>
+      <p class="lead">Let’s talk.</p>
+      <p id="hello-text"></p>
+      <div class="email-row">
+        <a class="email" id="email-link"></a>
+        <button class="copy" id="copy-email" type="button">Copy</button>
+        <span class="sr-only" id="copy-status" aria-live="polite"></span>
+      </div>
+    </section>
   </main>
 
   <footer>
@@ -338,6 +395,10 @@ const SITE = {
   intro: "I’m Rahul, a product designer who also builds. Two years of interaction and motion work, and now real apps made with AI-assisted coding. Everything I ship ends up here.",
 
   now: "Right now: shipping this site and posting the process on X.",
+
+  // Say hello section. Leave email empty ("") to hide the section.
+  email: "",
+  helloText: "Got a project, a role, or just want to chat? Email me.",
 
   projects: [
     {
@@ -390,6 +451,41 @@ const SITE = {
   $("now").textContent = SITE.now;
   $("background").textContent = SITE.background;
   $("updated").textContent = SITE.updated;
+
+  if (SITE.email) {
+    $("hello").hidden = false;
+    $("hello-text").textContent = SITE.helloText;
+    const link = $("email-link");
+    link.textContent = SITE.email;
+    link.href = "mailto:" + SITE.email;
+    const btn = $("copy-email"), status = $("copy-status");
+    let timer;
+    const done = () => {
+      btn.textContent = "Copied";
+      btn.dataset.copied = "";
+      status.textContent = "Email address copied";
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        btn.textContent = "Copy";
+        delete btn.dataset.copied;
+        status.textContent = "";
+      }, 1800);
+    };
+    btn.addEventListener("click", () => {
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(SITE.email).then(done, fallback);
+      } else fallback();
+    });
+    function fallback() {
+      const t = document.createElement("textarea");
+      t.value = SITE.email;
+      t.setAttribute("readonly", "");
+      t.style.position = "fixed"; t.style.opacity = "0";
+      document.body.appendChild(t); t.select();
+      try { document.execCommand("copy"); done(); } catch (e) {}
+      t.remove();
+    }
+  }
 
   const list = $("projects");
   SITE.projects.forEach((p) => {
