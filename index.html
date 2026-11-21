@@ -368,6 +368,93 @@
   }
   @media (prefers-reduced-motion: reduce) { .foot-social a { transition: none; } }
 
+  /* ---------- Top nav: profile on the left, progress circle on the right ---------- */
+  :root { --glass: rgba(255, 255, 255, 0.72); }
+  :root[data-theme="dark"] { --glass: rgba(26, 30, 39, 0.72); }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --glass: rgba(26, 30, 39, 0.72); } }
+  .page { padding-top: 5rem; }
+  main section, main h2[id], #hello { scroll-margin-top: 5.5rem; }
+  .pnav {
+    position: fixed; z-index: 60; top: 1rem; left: 50%; transform: translateX(-50%);
+    width: min(37.5rem, calc(100% - 2.5rem)); height: 3rem;
+    display: flex; align-items: center; justify-content: space-between;
+    font-family: var(--display);
+  }
+  .pnav .who {
+    box-sizing: border-box; height: 3rem; display: inline-flex; align-items: center; gap: 0.625rem;
+    margin-left: -0.375rem; padding: 0 1rem 0 0.375rem; border-radius: 999px; border: 1px solid transparent;
+    color: var(--ink); text-decoration: none; font-size: 0.9375rem; font-weight: 600;
+    transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
+  }
+  .pnav .who .avatar { width: 2.25rem; height: 2.25rem; }
+  .pnav .swap { display: inline-grid; overflow: hidden; height: 1.375rem; }
+  .pnav .swap > span { grid-area: 1 / 1; line-height: 1.375rem; white-space: nowrap; transition: transform 0.45s cubic-bezier(.34, 1.3, .5, 1), opacity 0.25s; }
+  .pnav .swap .sec { transform: translateY(110%); opacity: 0; font-weight: 500; }
+  .pnav .swap .sec small { margin-right: 0.375rem; font-size: 0.8125rem; font-weight: 400; color: var(--muted); }
+  .glass {
+    background: var(--glass); border-color: var(--line) !important;
+    -webkit-backdrop-filter: blur(16px) saturate(1.4); backdrop-filter: blur(16px) saturate(1.4);
+    box-shadow: 0 0.75rem 2rem rgba(0, 0, 0, 0.08);
+  }
+  .pnav.tucked:not(.at-top) .who { background: var(--glass); border-color: var(--line); -webkit-backdrop-filter: blur(16px) saturate(1.4); backdrop-filter: blur(16px) saturate(1.4); box-shadow: 0 0.75rem 2rem rgba(0, 0, 0, 0.08); }
+  .pnav.tucked:not(.at-top) .swap .nm { transform: translateY(-110%); opacity: 0; }
+  .pnav.tucked:not(.at-top) .swap .sec { transform: none; opacity: 1; }
+
+  .pnav .right {
+    position: absolute; right: 0; top: 0; height: 3rem; z-index: 2;
+    display: flex; align-items: center; gap: 0.125rem; border-radius: 999px; border: 1px solid transparent;
+    transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s, padding 0.3s;
+  }
+  .pnav .links { display: flex; align-items: center; gap: 0.125rem; }
+  .pnav .links a {
+    padding: 0.4375rem 0.75rem; border-radius: 999px; color: var(--muted); text-decoration: none; font-size: 0.9375rem; white-space: nowrap;
+    transition: transform 0.55s cubic-bezier(.34, 1.3, .5, 1), opacity 0.3s var(--ease), color 0.2s, background-color 0.2s;
+  }
+  .pnav .links a:hover { color: var(--ink); background: color-mix(in srgb, var(--line) 60%, transparent); }
+  .pnav .links a:focus-visible { outline: 2px solid var(--link); outline-offset: 1px; }
+  .pnav .theme-toggle { margin: 0; transition: transform 0.55s cubic-bezier(.34, 1.3, .5, 1), opacity 0.3s var(--ease), color 0.15s, background-color 0.15s; }
+  .pnav.tucked .right { padding: 0; }
+  .pnav.tucked:not(.fan) .right { pointer-events: none; }
+  .pnav.tucked .links a, .pnav.tucked .theme-toggle { opacity: 0; pointer-events: none; }
+  .pnav.tucked .links a:nth-child(1) { transform: translateX(15rem) scale(0.3); }
+  .pnav.tucked .links a:nth-child(2) { transform: translateX(11rem) scale(0.3); }
+  .pnav.tucked .links a:nth-child(3) { transform: translateX(7rem) scale(0.3); }
+  .pnav.tucked .links a:nth-child(4) { transform: translateX(3.5rem) scale(0.3); }
+  .pnav.tucked .theme-toggle { transform: translateX(1.5rem) scale(0.3); }
+  .pnav .links a:nth-child(4) { transition-delay: 0s; } .pnav .links a:nth-child(3) { transition-delay: 0.03s; }
+  .pnav .links a:nth-child(2) { transition-delay: 0.06s; } .pnav .links a:nth-child(1) { transition-delay: 0.09s; }
+  .pnav.tucked.fan .right { padding-left: 0.375rem; pointer-events: auto; background: var(--glass); border-color: var(--line); -webkit-backdrop-filter: blur(16px) saturate(1.4); backdrop-filter: blur(16px) saturate(1.4); box-shadow: 0 0.75rem 2rem rgba(0, 0, 0, 0.1); }
+  .pnav.tucked.fan .links a, .pnav.tucked.fan .theme-toggle { opacity: 1; transform: none; pointer-events: auto; }
+
+  .pnav .orb {
+    appearance: none; position: relative; flex: none; width: 0; height: 3rem; margin: 0; padding: 0; border: 0; border-radius: 50%;
+    background: var(--glass); -webkit-backdrop-filter: blur(16px) saturate(1.4); backdrop-filter: blur(16px) saturate(1.4);
+    box-shadow: 0 0.75rem 2rem rgba(0, 0, 0, 0.1); cursor: pointer; opacity: 0; transform: scale(0.4); overflow: hidden; pointer-events: none;
+    transition: width 0.5s cubic-bezier(.34, 1.3, .5, 1), opacity 0.3s, transform 0.5s cubic-bezier(.34, 1.3, .5, 1), margin 0.5s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .pnav.tucked .orb { width: 3rem; margin-left: 0.125rem; opacity: 1; transform: none; pointer-events: auto; }
+  .pnav.tucked.fan .orb { background: transparent; box-shadow: none; }
+  .pnav .orb:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+  .pnav .orb .ring { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .pnav .orb .track { fill: none; stroke: var(--line); stroke-width: 2.5; }
+  .pnav .orb .val { fill: none; stroke: var(--link); stroke-width: 2.5; stroke-linecap: round; transform: rotate(-90deg); transform-origin: 50% 50%; transition: stroke-dashoffset 0.12s linear; }
+  .pnav .orb .lines { position: absolute; left: 50%; top: 50%; width: 1rem; height: 0.75rem; transform: translate(-50%, -50%); }
+  .pnav .orb .lines i { position: absolute; left: 0; height: 2px; border-radius: 2px; background: var(--ink); transition: transform 0.45s cubic-bezier(.34, 1.3, .5, 1), width 0.3s var(--ease), top 0.3s var(--ease), left 0.3s var(--ease); }
+  .pnav .orb .lines i:nth-child(1) { top: 1px; width: 1rem; }
+  .pnav .orb .lines i:nth-child(2) { top: calc(100% - 3px); width: 0.625rem; left: 0.375rem; }
+  .pnav.fan .orb .lines i:nth-child(1) { top: calc(50% - 1px); transform: rotate(135deg); }
+  .pnav.fan .orb .lines i:nth-child(2) { top: calc(50% - 1px); width: 1rem; left: 0; transform: rotate(45deg); }
+
+  @media (max-width: 40rem) {
+    .pnav .links a { padding: 0.375rem 0.5rem; font-size: 0.875rem; }
+    .pnav.tucked:not(.fan) .links a { transform: translateX(8rem) scale(0.3) !important; }
+    .pnav .swap .sec small { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .pnav *, .pnav .who, .pnav .right { transition-duration: 0.01ms !important; transition-delay: 0s !important; }
+  }
+
   /* ---------- Theme switch transition: new theme washes down from the top ---------- */
   ::view-transition-old(root),
   ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
@@ -623,32 +710,26 @@
 </style>
 </head>
 <body>
-<div class="page">
+<div class="page" id="top">
 
-  <header class="top">
-    <span class="brand"><img class="avatar" src="avatar.webp" alt="" width="32" height="32"><span class="name">Rahul Builds</span></span>
-    <nav class="top-links" aria-label="Links">
-      <a href="https://x.com/Rahul_gaikarr">X</a>
-      <a href="https://github.com/Rahul-Gaikar">GitHub</a>
-      <a href="https://motionbyrahul.framer.website/">Motion<span class="wide-only"> work</span></a>
-      <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch to dark theme">
-      <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
-      <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5Z"/></svg>
-    </button>
-    </nav>
-    <button class="menu-btn" id="menu-btn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="menu"><span></span><span></span></button>
-    <nav class="menu" id="menu" aria-label="Menu">
-      <ul>
-        <li><a href="#built">Work</a></li>
-        <li><a href="https://motionbyrahul.framer.website/">Motion work</a></li>
-        <li><a href="support.html">Support</a></li>
-        <li><a href="#hello">Say hello</a></li>
-      </ul>
-      <div class="menu-foot">
-        <div class="socials"><a href="https://x.com/Rahul_gaikarr">X</a><a href="https://github.com/Rahul-Gaikar">GitHub</a></div>
-        <button class="menu-theme" id="menu-theme" type="button"><svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5Z"/></svg><span id="menu-theme-label">Dark</span></button>
-      </div>
-    </nav>
+  <header class="pnav" id="pnav">
+    <a class="who" href="#top" aria-label="Rahul Builds, back to top">
+      <img class="avatar" src="avatar.webp" alt="" width="36" height="36">
+      <span class="swap" aria-hidden="true"><span class="nm">Rahul Builds</span><span class="sec" id="pnav-sec"><small></small><span></span></span></span>
+    </a>
+    <div class="right" id="pnav-right">
+      <nav class="links" aria-label="Main">
+        <a href="#built">Work</a>
+        <a href="https://motionbyrahul.framer.website/">Motion</a>
+        <a href="support.html">Support</a>
+        <a href="#hello">Say hello</a>
+      </nav>
+      <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch to dark theme"><svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5Z"/></svg></button>
+      <button class="orb" id="pnav-orb" type="button" aria-label="Show links" aria-expanded="false" aria-controls="pnav-right">
+        <svg class="ring" viewBox="0 0 48 48" aria-hidden="true"><circle class="track" cx="24" cy="24" r="21.5"/><circle class="val" id="pnav-val" cx="24" cy="24" r="21.5" stroke-dasharray="135.09" stroke-dashoffset="135.09"/></svg>
+        <span class="lines" aria-hidden="true"><i></i><i></i></span>
+      </button>
+    </div>
   </header>
 
   <main>
@@ -1137,6 +1218,51 @@ const SITE = {
     if (root.classList.contains("menu-open") && !menu.contains(e.target) && !btn.contains(e.target)) setOpen(false);
   });
   matchMedia("(min-width: 40.0625rem)").addEventListener("change", (e) => { if (e.matches) setOpen(false); });
+})();
+
+/* ---------- Top nav: tuck links into the progress circle on scroll ---------- */
+(function () {
+  const nav = document.getElementById("pnav");
+  if (!nav) return;
+  const orb = document.getElementById("pnav-orb"), right = document.getElementById("pnav-right");
+  const val = document.getElementById("pnav-val"), sec = document.getElementById("pnav-sec");
+  const C = 135.09;
+  const setFan = (on) => { nav.classList.toggle("fan", on); orb.setAttribute("aria-expanded", on); orb.setAttribute("aria-label", on ? "Hide links" : "Show links"); };
+  orb.addEventListener("click", () => setFan(!nav.classList.contains("fan")));
+  right.addEventListener("pointerenter", (e) => { if (e.pointerType === "mouse" && nav.classList.contains("tucked")) setFan(true); });
+  right.addEventListener("pointerleave", (e) => { if (e.pointerType === "mouse") setFan(false); });
+  document.addEventListener("click", (e) => { if (nav.classList.contains("fan") && !nav.contains(e.target)) setFan(false); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && nav.classList.contains("fan")) { setFan(false); orb.focus(); } });
+  nav.querySelectorAll(".links a").forEach((a) => a.addEventListener("click", () => setFan(false)));
+
+  const sections = [...document.querySelectorAll("main > section")];
+  let ticking = false;
+  const update = () => {
+    ticking = false;
+    const y = scrollY, max = document.documentElement.scrollHeight - innerHeight;
+    const p = max > 0 ? Math.min(1, y / max) : 0;
+    const tucked = y > 120 || innerWidth <= 640;
+    nav.classList.toggle("tucked", tucked);
+    nav.classList.toggle("at-top", y <= 120);
+    if (!tucked) setFan(false);
+    val.style.strokeDashoffset = (C * (1 - p)).toFixed(2);
+    let cur = null, idx = 0, n = 0;
+    sections.forEach((s) => {
+      if (s.hidden) return;
+      n++;
+      if (s.getBoundingClientRect().top < innerHeight * 0.35) { cur = s; idx = n; }
+    });
+    const h = cur && cur.querySelector("h2");
+    const label = h ? h.textContent.trim() : "Rahul Builds";
+    if (sec.dataset.k !== label) {
+      sec.dataset.k = label;
+      sec.firstChild.textContent = cur ? String(idx).padStart(2, "0") : "";
+      sec.lastChild.textContent = label;
+    }
+  };
+  addEventListener("scroll", () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
+  addEventListener("resize", update);
+  update();
 })();
 </script>
 </body>
