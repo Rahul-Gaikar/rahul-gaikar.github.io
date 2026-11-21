@@ -7,7 +7,7 @@
   try { var t = localStorage.getItem("theme"); if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; } catch (e) {}
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Rahul Builds: apps, templates and motion by Rahul Gaikar</title>
+<title>Rahul Builds v2 Lab</title>
 <meta name="description" content="Rahul Gaikar is a product designer who builds. Apps, experiments, templates, and motion work, all in one place.">
 <meta property="og:title" content="Rahul Builds">
 <meta property="og:site_name" content="Rahul Builds">
@@ -161,10 +161,39 @@
   }
 
   /* ---------- Project list ---------- */
-  .projects { list-style: none; margin: 0; padding: 0; }
-  .project { padding: 1.25rem 0; border-top: 1px solid var(--line); }
-  .project:first-child { border-top: 0; padding-top: 0; }
-  .project:last-child { padding-bottom: 0; }
+  .projects { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+  .project { border-bottom: 1px solid var(--line); }
+  .project summary {
+    list-style: none; display: grid; grid-template-columns: minmax(0, 1fr) auto auto auto; align-items: center; gap: 0.875rem;
+    padding: 1.125rem 0; cursor: pointer; -webkit-tap-highlight-color: transparent;
+  }
+  .project summary::-webkit-details-marker { display: none; }
+  .project summary:focus-visible { outline: 2px solid var(--link); outline-offset: 4px; border-radius: 6px; }
+  .p-title { display: flex; align-items: center; flex-wrap: wrap; gap: 0 0.25rem; min-width: 0; }
+  .p-name { font-family: var(--display); font-weight: 600; font-size: 1.375rem; letter-spacing: -0.02em; line-height: 1.2; transition: transform 0.3s var(--ease); }
+  .project summary:hover .p-name { transform: translateX(4px); }
+  .p-kind { font-family: var(--display); font-size: 0.8125rem; color: var(--muted); white-space: nowrap; }
+  .plus { position: relative; width: 1.75rem; height: 1.75rem; border-radius: 50%; border: 1px solid var(--line); transition: transform 0.35s var(--ease), background-color 0.2s var(--ease), border-color 0.2s var(--ease); }
+  .plus::before, .plus::after { content: ""; position: absolute; left: 50%; top: 50%; width: 0.625rem; height: 1.5px; border-radius: 1px; background: var(--ink); transform: translate(-50%, -50%); }
+  .plus::after { transform: translate(-50%, -50%) rotate(90deg); }
+  .project summary:hover .plus { border-color: var(--muted); }
+  .project details[open] .plus { transform: rotate(45deg); background: var(--line); }
+  .p-body { padding: 0 0 1.5rem; }
+  .project details[open] .p-body { animation: p-open 0.4s var(--ease); }
+  @keyframes p-open { from { opacity: 0; transform: translateY(-6px); } }
+  .p-body > p:first-of-type { margin-top: 0; }
+  .p-media { margin-bottom: 1rem; border-radius: 1rem; overflow: hidden; border: 1px solid var(--line); background: var(--line); }
+  .p-media img, .p-media video { display: block; width: 100%; height: auto; }
+  @media (hover: hover) and (pointer: fine) { .p-media { display: none; } }
+  .peek {
+    position: fixed; left: 0; top: 0; z-index: 40; width: 16rem; pointer-events: none;
+    border-radius: 0.875rem; overflow: hidden; box-shadow: 0 1.25rem 2.5rem rgba(0,0,0,.2);
+    opacity: 0; scale: 0.92; transition: opacity 0.2s var(--ease), scale 0.3s var(--ease);
+  }
+  .peek.is-on { opacity: 1; scale: 1; }
+  .peek img, .peek video { display: block; width: 100%; height: auto; }
+  @media (max-width: 26rem) { .p-kind { display: none; } }
+  @media (prefers-reduced-motion: reduce) { .p-name, .plus, .peek { transition: none; } .project details[open] .p-body { animation: none; } }
   .project-head {
     display: flex;
     align-items: baseline;
@@ -686,6 +715,7 @@ const SITE = {
   projects: [
     {
       name: "Glowfinder",
+      kind: "App",
       badge: "New",
       status: "live",
       statusLabel: "Live",
@@ -711,6 +741,7 @@ const SITE = {
     },
     {
       name: "Hourglass",
+      kind: "Android app",
       status: "shipped",
       statusLabel: "Shipped",
       text: "A focus timer built around one gesture. Flip your phone face-down to start, watch the sand fall, flip it back for a break. Android, fully offline, no account.",
@@ -722,6 +753,7 @@ const SITE = {
     },
     {
       name: "Orbito 3D",
+      kind: "Game",
       status: "live",
       statusLabel: "Live",
       text: "A two-player strategy board game in 3D, inspired by Orbito, where the board shifts under your pieces. Play against a bot or a friend online.",
@@ -732,6 +764,7 @@ const SITE = {
     },
     {
       name: "Bucket List",
+      kind: "Notion template",
       status: "live",
       statusLabel: "Live",
       text: "A Notion template for the things you want to buy, learn, and do. Plan each wish with a price range, compare your options, then move it to the bucket with a photo, the final price, and how it went.",
@@ -866,27 +899,35 @@ const SITE = {
     if (st.source) box.appendChild(el("p", "stats-source", st.source));
     return box;
   }
-  SITE.projects.forEach((p) => {
+  // ---------- Expandable project list ----------
+  SITE.projects.forEach((p, i) => {
     const li = el("li", "project");
+    const det = document.createElement("details");
+    if (i === 0) det.open = true;
+    if (p.media) det.dataset.media = i;
 
-    const head = el("div", "project-head");
-    const h3 = el("h3", "", p.name);
-    if (p.badge) h3.appendChild(el("span", "badge", p.badge));
-    head.appendChild(h3);
+    const sum = document.createElement("summary");
+    const title = el("span", "p-title");
+    title.appendChild(el("span", "p-name", p.name));
+    if (p.badge) title.appendChild(el("span", "badge", p.badge));
+    sum.appendChild(title);
     const status = el("span", "status", p.statusLabel);
     status.dataset.status = p.status;
-    head.appendChild(status);
-    li.appendChild(head);
+    sum.appendChild(status);
+    if (p.kind) sum.appendChild(el("span", "p-kind", p.kind));
+    const plus = el("span", "plus"); plus.setAttribute("aria-hidden", "true");
+    sum.appendChild(plus);
+    det.appendChild(sum);
 
-    if (p.text) li.appendChild(el("p", "", p.text));
-    if (p.stats) li.appendChild(statsBlock(p.stats));
-    if (p.note) li.appendChild(el("p", "note", p.note));
-
+    const body = el("div", "p-body");
+    if (p.media) body.appendChild(mediaEl(p.media, "p-media"));
+    if (p.text) body.appendChild(el("p", "", p.text));
+    if (p.stats) body.appendChild(statsBlock(p.stats));
+    if (p.note) body.appendChild(el("p", "note", p.note));
     if (p.links && p.links.length) {
       const links = el("div", "links");
       p.links.forEach((l) => {
         if (l.soon) {
-          // Placeholder for a page that doesn't exist yet
           const span = el("span", "soon", l.label);
           span.appendChild(el("span", "soon-tag", "Coming soon"));
           links.appendChild(span);
@@ -896,10 +937,78 @@ const SITE = {
         a.href = l.url;
         links.appendChild(a);
       });
-      li.appendChild(links);
+      body.appendChild(links);
     }
+    det.appendChild(body);
+    li.appendChild(det);
     list.appendChild(li);
   });
+
+  // Add visuals later per project, e.g.
+  //   media: { type: "video", src: "media/glowfinder.mp4", poster: "media/glowfinder.jpg" }
+  //   media: { type: "image", src: "media/hourglass.jpg", alt: "Hourglass timer screen" }
+  // Image or short muted video. Videos only load when first needed.
+  function mediaEl(m, cls) {
+    const wrap = el("div", cls);
+    if (m.type === "video") {
+      const v = document.createElement("video");
+      v.muted = true; v.loop = true; v.playsInline = true; v.preload = "none";
+      v.setAttribute("aria-hidden", "true");
+      v.dataset.src = m.src; if (m.poster) v.poster = m.poster;
+      wrap.appendChild(v);
+    } else {
+      const img = document.createElement("img");
+      img.src = m.src; img.alt = m.alt || ""; img.loading = "lazy"; img.decoding = "async";
+      wrap.appendChild(img);
+    }
+    return wrap;
+  }
+  const playIn = (wrap) => {
+    const v = wrap && wrap.querySelector("video");
+    if (!v) return;
+    if (!v.src && v.dataset.src) v.src = v.dataset.src;
+    v.play().catch(() => {});
+  };
+  const pauseIn = (wrap) => { const v = wrap && wrap.querySelector("video"); if (v) v.pause(); };
+
+  // Phones: play a row's video when it is opened
+  list.querySelectorAll("details").forEach((d) => {
+    d.addEventListener("toggle", () => {
+      const w = d.querySelector(".p-media");
+      if (d.open) playIn(w); else pauseIn(w);
+    });
+  });
+
+  // Laptops: floating preview that follows the cursor over a row
+  const canHover = matchMedia("(hover: hover) and (pointer: fine)").matches;
+  if (canHover && SITE.projects.some((p) => p.media)) {
+    const peek = el("div", "peek"); peek.setAttribute("aria-hidden", "true");
+    document.body.appendChild(peek);
+    const cache = {};
+    let tx = 0, ty = 0, x = 0, y = 0, raf = 0, current = null;
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const loop = () => {
+      x += (tx - x) * (reduce ? 1 : 0.18); y += (ty - y) * (reduce ? 1 : 0.18);
+      peek.style.transform = "translate(" + x.toFixed(1) + "px," + y.toFixed(1) + "px)";
+      raf = requestAnimationFrame(loop);
+    };
+    list.querySelectorAll("details[data-media] > summary").forEach((sum) => {
+      const idx = sum.parentElement.dataset.media;
+      sum.addEventListener("pointerenter", (e) => {
+        if (!cache[idx]) cache[idx] = mediaEl(SITE.projects[idx].media, "peek-media");
+        if (current) pauseIn(current);
+        peek.replaceChildren(cache[idx]); current = cache[idx]; playIn(current);
+        tx = x = e.clientX + 24; ty = y = e.clientY - 90;
+        peek.classList.add("is-on");
+        if (!raf) raf = requestAnimationFrame(loop);
+      });
+      sum.addEventListener("pointermove", (e) => { tx = e.clientX + 24; ty = e.clientY - 90; });
+      sum.addEventListener("pointerleave", () => {
+        peek.classList.remove("is-on"); pauseIn(current);
+        setTimeout(() => { if (!peek.classList.contains("is-on")) { cancelAnimationFrame(raf); raf = 0; } }, 300);
+      });
+    });
+  }
 })();
 
 /* ---------- Theme toggle: light and dark, remembered per visitor ---------- */
