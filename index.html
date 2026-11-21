@@ -487,9 +487,17 @@
   .pnav .swap { transition: width 0.45s cubic-bezier(.34, 1.3, .5, 1), opacity 0.25s; }
   .pnav.squeeze.fan .swap { width: 0 !important; opacity: 0; }
   .pnav.squeeze.fan .who { padding-right: 0.375rem; gap: 0; }
-  .pnav.squeeze.fan .right { left: 3.25rem; padding-left: 0.25rem; }
-  .pnav.squeeze.fan .links { flex: 1; min-width: 0; justify-content: space-between; gap: 0; }
-  .pnav.squeeze.fan .links a { padding-left: 0.3125rem; padding-right: 0.3125rem; font-size: 0.8125rem; }
+  /* only on the narrowest screens, and only if the bar can't fit beside the avatar: tighten the link padding */
+  .pnav.tight.fan .links { gap: 0; }
+  .pnav.tight.fan .links a { padding-left: 0.375rem; padding-right: 0.375rem; font-size: 0.8125rem; }
+  /* narrowest screens: the bar can't sit beside the avatar, so the avatar melts into the bar */
+  .pnav .who { transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s, transform 0.5s cubic-bezier(.34, 1.2, .5, 1), opacity 0.3s; }
+  .pnav.tight.fan .who { transform: translateX(2.5rem) scale(0.5); opacity: 0; pointer-events: none; }
+  .pnav.tight.fan .g-who { opacity: 0; transition: opacity 0.45s var(--ease); }
+  @media (max-width: 22rem) {
+    .pnav.tight.fan .links a { padding-left: 0.25rem; padding-right: 0.25rem; font-size: 0.78rem; }
+    .pnav.tight.fan .theme-toggle { width: 2rem; }
+  }
   @media (prefers-reduced-motion: reduce) { .g-right, .g-who, .pnav .swap { transition: none !important; } }
 
   /* ---------- Theme switch transition: new theme washes down from the top ---------- */
@@ -1397,11 +1405,7 @@ const SITE = {
     as.forEach((x) => { lw += x.offsetWidth; });
     lw += parseFloat(getComputedStyle(links).columnGap || 0) * Math.max(0, as.length - 1);
     const w = Math.ceil(lw + tt.offsetWidth + 48 + 2 * 2 + 6 + 2);
-    if (nav.classList.contains("squeeze")) {
-      // squeezed: the bar fills everything to the right of the avatar
-      const n = nav.getBoundingClientRect().width;
-      nav.style.setProperty("--rw", (n - 52) + "px");
-    } else nav.style.setProperty("--rw", w + "px");
+    nav.style.setProperty("--rw", w + "px");   // the bar keeps its natural width
     return w;
   };
   const frame = (t) => {
@@ -1417,13 +1421,16 @@ const SITE = {
   // natural (unsqueezed) widths are cached so the decision can't flip-flop
   let whoW = 0, barW = 0;
   const check = () => {
-    const squeezed = nav.classList.contains("squeeze");
-    if (!squeezed) {
-      whoW = who.getBoundingClientRect().width || whoW;
-      barW = measureRight();
-    }
-    const should = whoW + barW + 12 > nav.getBoundingClientRect().width;
-    if (squeezed !== should) nav.classList.toggle("squeeze", should);
+    const squeezed = nav.classList.contains("squeeze"), tight = nav.classList.contains("tight");
+    if (!squeezed) whoW = who.getBoundingClientRect().width || whoW;
+    if (!tight) barW = measureRight();
+    const n = nav.getBoundingClientRect().width;
+    // 1) label hides only if the open bar would hit the full profile pill
+    const sq = whoW + barW + 12 > n;
+    // 2) links tighten only if the bar still can't fit next to the avatar alone
+    const ti = barW > n - 56;
+    if (squeezed !== sq) nav.classList.toggle("squeeze", sq);
+    if (tight !== ti) nav.classList.toggle("tight", ti);
     measureRight();
     kick();
   };
