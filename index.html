@@ -179,7 +179,6 @@
   .project summary:hover .plus { border-color: var(--muted); }
   .project details[open] .plus { transform: rotate(45deg); background: var(--line); }
   .p-body { padding: 0 0 1.5rem; }
-  .project details[open] .p-body { animation: p-open 0.4s var(--ease); }
   @keyframes p-open { from { opacity: 0; transform: translateY(-6px); } }
   .p-body > p:first-of-type { margin-top: 0; }
   .p-media { margin-bottom: 1rem; border-radius: 1rem; overflow: hidden; border: 1px solid var(--line); background: var(--line); }
@@ -458,6 +457,41 @@
     .pnav *, .pnav .who, .pnav .right { transition-duration: 0.01ms !important; transition-delay: 0s !important; }
   }
 
+  /* ---------- Liquid merge: both pills share one gooey background layer ---------- */
+  :root { --pill: #FFFFFF; }
+  :root[data-theme="dark"] { --pill: #1C2029; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --pill: #1C2029; } }
+  .goo-defs { position: absolute; width: 0; height: 0; }
+  .pnav .goo {
+    position: absolute; inset: 0; z-index: 0; pointer-events: none;
+    filter: url(#pnav-goo) drop-shadow(0 0 0.5px rgba(0, 0, 0, 0.28)) drop-shadow(0 0.625rem 1.25rem rgba(0, 0, 0, 0.08));
+  }
+  :root[data-theme="dark"] .pnav .goo { filter: url(#pnav-goo) drop-shadow(0 0 0.5px rgba(255, 255, 255, 0.22)) drop-shadow(0 0.625rem 1.25rem rgba(0, 0, 0, 0.35)); }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .pnav .goo { filter: url(#pnav-goo) drop-shadow(0 0 0.5px rgba(255, 255, 255, 0.22)) drop-shadow(0 0.625rem 1.25rem rgba(0, 0, 0, 0.35)); } }
+  .pnav .goo span { position: absolute; top: 0; height: 3rem; border-radius: 999px; background: var(--pill); }
+  .g-who { left: 0; width: 3rem; opacity: 0; transition: opacity 0.3s var(--ease); }
+  .pnav.tucked:not(.at-top) .g-who { opacity: 1; }
+  .g-right {
+    right: 0; width: 3rem; opacity: 0; transform: scale(0.4); transform-origin: 100% 50%;
+    transition: width 0.6s cubic-bezier(.34, 1.25, .5, 1), opacity 0.3s, transform 0.5s cubic-bezier(.34, 1.3, .5, 1);
+  }
+  .pnav.tucked .g-right { opacity: 1; transform: none; }
+  .pnav.tucked.fan .g-right { width: var(--rw, 22rem); }
+  /* the visible pills no longer paint their own background; the goo layer does */
+  .pnav .who, .pnav .right { position: relative; z-index: 1; }
+  .pnav .right { position: absolute; z-index: 2; }
+  .pnav.tucked:not(.at-top) .who,
+  .pnav.tucked.fan .right { background: transparent !important; border-color: transparent !important; box-shadow: none !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+  .pnav .orb, .pnav.tucked.fan .orb { background: transparent; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
+  /* small screens: when the open bar would hit the profile, the profile shrinks to the avatar and they melt into one bar */
+  .pnav .swap { transition: width 0.45s cubic-bezier(.34, 1.3, .5, 1), opacity 0.25s; }
+  .pnav.squeeze.fan .swap { width: 0 !important; opacity: 0; }
+  .pnav.squeeze.fan .who { padding-right: 0.375rem; gap: 0; }
+  .pnav.squeeze.fan .right { left: 3.25rem; padding-left: 0.25rem; }
+  .pnav.squeeze.fan .links { flex: 1; min-width: 0; justify-content: space-between; gap: 0; }
+  .pnav.squeeze.fan .links a { padding-left: 0.3125rem; padding-right: 0.3125rem; font-size: 0.8125rem; }
+  @media (prefers-reduced-motion: reduce) { .g-right, .g-who, .pnav .swap { transition: none !important; } }
+
   /* ---------- Theme switch transition: new theme washes down from the top ---------- */
   ::view-transition-old(root),
   ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
@@ -716,6 +750,13 @@
 <div class="page" id="top">
 
   <header class="pnav" id="pnav">
+    <svg class="goo-defs" width="0" height="0" aria-hidden="true" focusable="false">
+      <filter id="pnav-goo" x="-20%" y="-50%" width="140%" height="200%">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="7" result="b"/>
+        <feColorMatrix in="b" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 22 -10"/>
+      </filter>
+    </svg>
+    <div class="goo" aria-hidden="true"><span class="g-who" id="g-who"></span><span class="g-right"></span></div>
     <a class="who" href="#top" aria-label="Rahul Builds, back to top">
       <img class="avatar" src="avatar.webp" alt="" width="36" height="36">
       <span class="swap" aria-hidden="true"><span class="nm">Rahul Builds</span><span class="sec" id="pnav-sec"></span></span>
@@ -1127,6 +1168,38 @@ const SITE = {
   };
   const pauseIn = (wrap) => { const v = wrap && wrap.querySelector("video"); if (v) v.pause(); };
 
+  // Smooth open and close: animate the row's height instead of snapping
+  const smooth = !matchMedia("(prefers-reduced-motion: reduce)").matches;
+  list.querySelectorAll("details").forEach((d) => {
+    const sum = d.querySelector("summary"), body = d.querySelector(".p-body");
+    let anim = null;
+    sum.addEventListener("click", (e) => {
+      if (!smooth) return;
+      e.preventDefault();
+      const opening = !d.open || d.dataset.closing === "1";
+      const startH = d.getBoundingClientRect().height;
+      if (anim) anim.cancel();
+      d.style.overflow = "hidden";
+      if (opening) {
+        d.dataset.closing = "";
+        d.open = true;
+        const endH = sum.offsetHeight + body.offsetHeight;
+        anim = d.animate([{ height: startH + "px" }, { height: endH + "px" }], { duration: 480, easing: "cubic-bezier(.2, .8, .2, 1)" });
+        body.animate([{ opacity: 0, transform: "translateY(-8px)" }, { opacity: 1, transform: "none" }], { duration: 420, delay: 60, easing: "cubic-bezier(.2, .8, .2, 1)", fill: "backwards" });
+      } else {
+        d.dataset.closing = "1";
+        const endH = sum.offsetHeight;
+        anim = d.animate([{ height: startH + "px" }, { height: endH + "px" }], { duration: 380, easing: "cubic-bezier(.4, 0, .2, 1)" });
+        body.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 220, easing: "ease-out", fill: "forwards" });
+      }
+      anim.onfinish = () => {
+        if (d.dataset.closing === "1") { d.open = false; d.dataset.closing = ""; }
+        body.getAnimations().forEach((a) => a.cancel());
+        d.style.overflow = ""; anim = null;
+      };
+    });
+  });
+
   // Phones: play a row's video when it is opened
   list.querySelectorAll("details").forEach((d) => {
     d.addEventListener("toggle", () => {
@@ -1231,8 +1304,12 @@ const SITE = {
   const val = document.getElementById("pnav-val"), sec = document.getElementById("pnav-sec");
   const C = 135.09;
   const setFan = (on) => { nav.classList.toggle("fan", on); orb.setAttribute("aria-expanded", on); orb.setAttribute("aria-label", on ? "Hide links" : "Show links"); };
-  orb.addEventListener("click", () => setFan(!nav.classList.contains("fan")));
-  right.addEventListener("pointerenter", (e) => { if (e.pointerType === "mouse" && nav.classList.contains("tucked")) setFan(true); });
+  let hoverOpenedAt = 0;
+  orb.addEventListener("click", () => {
+    if (nav.classList.contains("fan") && performance.now() - hoverOpenedAt < 700) return;
+    setFan(!nav.classList.contains("fan"));
+  });
+  right.addEventListener("pointerenter", (e) => { if (e.pointerType === "mouse" && nav.classList.contains("tucked") && !nav.classList.contains("fan")) { setFan(true); hoverOpenedAt = performance.now(); } });
   right.addEventListener("pointerleave", (e) => { if (e.pointerType === "mouse") setFan(false); });
   document.addEventListener("click", (e) => { if (nav.classList.contains("fan") && !nav.contains(e.target)) setFan(false); });
   document.addEventListener("keydown", (e) => { if (e.key === "Escape" && nav.classList.contains("fan")) { setFan(false); orb.focus(); } });
@@ -1305,6 +1382,55 @@ const SITE = {
   addEventListener("scroll", () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
   addEventListener("resize", update);
   update();
+})();
+
+/* ---------- Liquid merge: keep the goo shapes in step with the real pills ---------- */
+(function () {
+  const nav = document.getElementById("pnav");
+  if (!nav) return;
+  const who = nav.querySelector(".who"), right = document.getElementById("pnav-right"), gWho = document.getElementById("g-who");
+  const links = nav.querySelector(".links"), tt = document.getElementById("theme-toggle");
+  let until = 0, raf = 0;
+  const measureRight = () => {
+    // full width of the open bar (offsetWidth ignores the tuck transforms)
+    let lw = 0; const as = links.querySelectorAll("a");
+    as.forEach((x) => { lw += x.offsetWidth; });
+    lw += parseFloat(getComputedStyle(links).columnGap || 0) * Math.max(0, as.length - 1);
+    const w = Math.ceil(lw + tt.offsetWidth + 48 + 2 * 2 + 6 + 2);
+    if (nav.classList.contains("squeeze")) {
+      // squeezed: the bar fills everything to the right of the avatar
+      const n = nav.getBoundingClientRect().width;
+      nav.style.setProperty("--rw", (n - 52) + "px");
+    } else nav.style.setProperty("--rw", w + "px");
+    return w;
+  };
+  const frame = (t) => {
+    const n = nav.getBoundingClientRect(), r = who.getBoundingClientRect();
+    gWho.style.left = (r.left - n.left) + "px";
+    gWho.style.width = r.width + "px";
+    if (t < until) raf = requestAnimationFrame(frame); else raf = 0;
+  };
+  const kick = (ms = 900) => {
+    until = performance.now() + ms;
+    if (!raf) raf = requestAnimationFrame(frame);
+  };
+  // natural (unsqueezed) widths are cached so the decision can't flip-flop
+  let whoW = 0, barW = 0;
+  const check = () => {
+    const squeezed = nav.classList.contains("squeeze");
+    if (!squeezed) {
+      whoW = who.getBoundingClientRect().width || whoW;
+      barW = measureRight();
+    }
+    const should = whoW + barW + 12 > nav.getBoundingClientRect().width;
+    if (squeezed !== should) nav.classList.toggle("squeeze", should);
+    measureRight();
+    kick();
+  };
+  new MutationObserver(check).observe(nav, { attributes: true, attributeFilter: ["class"] });
+  addEventListener("resize", check);
+  addEventListener("scroll", () => kick(500), { passive: true });
+  check();
 })();
 </script>
 </body>
