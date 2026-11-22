@@ -485,15 +485,17 @@
   .pnav .orb, .pnav.tucked.fan .orb { background: transparent; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
   /* small screens: when the open bar would hit the profile, the profile shrinks to the avatar and they melt into one bar */
   .pnav .swap { transition: width 0.45s cubic-bezier(.34, 1.3, .5, 1), opacity 0.25s; }
-  .pnav.squeeze.fan .swap { width: 0 !important; opacity: 0; }
-  .pnav.squeeze.fan .who { padding-right: 0.375rem; gap: 0; }
+  /* Merge only when the open bar actually touches the profile pill:
+     the bar keeps its own width, the pill gives up just enough room, and the two become one container */
+  .pnav .who { max-width: 40rem; transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s, max-width 0.55s cubic-bezier(.34, 1.15, .5, 1), transform 0.5s cubic-bezier(.34, 1.2, .5, 1), opacity 0.3s; }
+  .pnav.merge.fan .who { max-width: var(--whomax, 40rem); overflow: hidden; }
+  .pnav.merge.fan .swap { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 1.25rem), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 1.25rem), transparent); }
   /* only on the narrowest screens, and only if the bar can't fit beside the avatar: tighten the link padding */
   .pnav.tight.fan .links { gap: 0; }
   .pnav.tight.fan .links a { padding-left: 0.375rem; padding-right: 0.375rem; font-size: 0.8125rem; }
   /* narrowest screens: the bar can't sit beside the avatar, so the avatar melts into the bar */
-  .pnav .who { transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s, transform 0.5s cubic-bezier(.34, 1.2, .5, 1), opacity 0.3s; }
-  .pnav.tight.fan .who { transform: translateX(2.5rem) scale(0.5); opacity: 0; pointer-events: none; }
-  .pnav.tight.fan .g-who { opacity: 0; transition: opacity 0.45s var(--ease); }
+  .pnav.melt.fan .who { transform: translateX(2.5rem) scale(0.5); opacity: 0; pointer-events: none; }
+  .pnav.melt.fan .g-who { opacity: 0; transition: opacity 0.45s var(--ease); }
   @media (max-width: 22rem) {
     .pnav.tight.fan .links a { padding-left: 0.25rem; padding-right: 0.25rem; font-size: 0.78rem; }
     .pnav.tight.fan .theme-toggle { width: 2rem; }
@@ -1411,26 +1413,34 @@ const SITE = {
   const frame = (t) => {
     const n = nav.getBoundingClientRect(), r = who.getBoundingClientRect();
     gWho.style.left = (r.left - n.left) + "px";
-    gWho.style.width = r.width + "px";
+    // when merged, let the pill's blob reach into the bar so the two read as one container
+    const reach = nav.classList.contains("merge") && nav.classList.contains("fan") && !nav.classList.contains("melt") ? 18 : 0;
+    gWho.style.width = (r.width + reach) + "px";
     if (t < until) raf = requestAnimationFrame(frame); else raf = 0;
   };
   const kick = (ms = 900) => {
     until = performance.now() + ms;
     if (!raf) raf = requestAnimationFrame(frame);
   };
-  // natural (unsqueezed) widths are cached so the decision can't flip-flop
-  let whoW = 0, barW = 0;
+  // natural widths are cached so the decision can't flip-flop
+  let whoW = 0, barW = 0, barTight = 0;
+  const AVATAR = 48;
+  const set = (c, on) => { if (nav.classList.contains(c) !== on) nav.classList.toggle(c, on); };
   const check = () => {
-    const squeezed = nav.classList.contains("squeeze"), tight = nav.classList.contains("tight");
-    if (!squeezed) whoW = who.getBoundingClientRect().width || whoW;
-    if (!tight) barW = measureRight();
+    if (!nav.classList.contains("merge")) whoW = who.getBoundingClientRect().width || whoW;
+    if (!nav.classList.contains("tight")) barW = measureRight();
     const n = nav.getBoundingClientRect().width;
-    // 1) label hides only if the open bar would hit the full profile pill
-    const sq = whoW + barW + 12 > n;
-    // 2) links tighten only if the bar still can't fit next to the avatar alone
-    const ti = barW > n - 56;
-    if (squeezed !== sq) nav.classList.toggle("squeeze", sq);
-    if (tight !== ti) nav.classList.toggle("tight", ti);
+    // touching = the bar at its natural width would reach the profile pill
+    const touching = whoW + barW + 2 >= n;
+    let tight = false, melt = false, room = n - barW;
+    if (touching && room < AVATAR) {           // not even the avatar fits: tighten the links
+      tight = true;
+      if (!barTight || !nav.classList.contains("tight")) { nav.classList.add("tight"); barTight = measureRight(); }
+      room = n - barTight;
+      if (room < AVATAR) melt = true;          // last resort on the smallest phones
+    }
+    set("merge", touching); set("tight", tight); set("melt", melt);
+    nav.style.setProperty("--whomax", Math.max(AVATAR, Math.floor(room)) + "px");
     measureRight();
     kick();
   };
