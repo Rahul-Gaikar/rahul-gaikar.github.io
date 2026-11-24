@@ -46,7 +46,7 @@ Rahul is a product designer, not a developer. Talk to him in plain words, show c
 v2 shipped on 25 Nov 2026, so `main` and `v2` are identical right now. New experiments go on `v2` again; the pre-v2 live site is saved as the git tag `live-before-v2`.
 
 - **Nav:** profile pill on the left (turns into a "you are here" label with a rolling section-name animation on scroll); links tuck into a **progress circle** on the right; hover the circle to fan them out on laptops. When the open bar would touch the profile pill, the two **merge like liquid** (SVG goo filter). On phones, tapping the circle opens a **dropdown card** that merges with the profile pill into one container (links, X/GitHub, theme toggle). On the narrowest phones the avatar melts into the bar.
-- **"Building now"** section: Hourglass 3D, collapsible, with a stats area (milestones + waitlist) that stays hidden until real data is added.
+- **"Building now"** section: Hourglass 3D and Hatchwise (Miscrits breeding calculator, hatchwise-neon.vercel.app), collapsible cards, with a stats area (milestones + waitlist) that stays hidden until real data is added.
 - **Projects as an expandable list** (outlined plus that turns into a minus), with smooth height animation: Glowfinder (new, visits/sign-ups sparkline), Hourglass (website, APK, GitHub links), Orbito 3D, Bucket List. A hover-preview system is wired in (`media: { type: "image" | "video", src, poster, alt }` per project) and turns on once visuals exist.
 - "Before this" (Port), "Motion for hire" (quiet neutral card), "Say hello" with email + copy button and the Claude-goal card (neutral, warms to orange on hover/tap).
 - Footer with avatar, one-liner and social pills (X, YouTube, Instagram, GitHub) with a fill-and-roll hover. **Rahul doesn't like this hover yet; leave it until he shares his changes.**
@@ -58,7 +58,7 @@ v2 shipped on 25 Nov 2026, so `main` and `v2` are identical right now. New exper
 2. **Wider layout (planned, approved in principle):** page width steps up with the screen (full width on phones, ~56rem on laptops, ~68rem max on large screens), with a two-column layout on big screens (sticky section titles on the left, content on the right). Paragraphs stay capped at ~34rem.
 3. **Hourglass 3D:** co-founder's name and link for the credit line, milestones, waitlist link and count.
 4. **Support page** still uses the old top bar; give it the new nav.
-5. The second Miscrits app (spawn locations + search counter) can be added once Rahul shares its name, link and status.
+5. The Miscrits spawn atlas (spawn locations + search counter) can be added once Rahul shares its name, link and status.
 6. Exact launch months for Hourglass and Orbito 3D (only needed if a layout shows dates).
 7. **"Before this" rework:** four directions proposed (fold into Motion for hire as a proof line, a Port → freelance → building path strip, show a Port motion clip, or sharpen the copy). Waiting on Rahul's pick, plus whether he has Port visuals and a Port site link.
 8. **Project card hover animations:** requested, not started.
