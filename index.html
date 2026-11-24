@@ -7,7 +7,7 @@
   try { var t = localStorage.getItem("theme"); if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; } catch (e) {}
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Rahul Builds v2 Lab</title>
+<title>Rahul Builds: apps, templates and motion by Rahul Gaikar</title>
 <meta name="description" content="Rahul Gaikar is a product designer who builds. Apps, experiments, templates, and motion work, all in one place.">
 <meta property="og:title" content="Rahul Builds">
 <meta property="og:site_name" content="Rahul Builds">
@@ -44,26 +44,26 @@
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --bg: #12151C;
-      --ink: #ECEEF2;
-      --muted: #9AA1AE;
-      --line: #272C38;
-      --link: #9AA8FF;
-      --shipped: #4CC985;
-      --building: #F0B34A;
-    --claude-soft: #2A1F1C;
-      --claude-soft: #2A1F1C;
+      --bg: #0F0F10;
+      --ink: #EDEDEF;
+      --muted: #909096;
+      --line: #2A2A2D;
+      --link: #A9B3F5;
+      --shipped: #6CBF8F;
+      --building: #D9A757;
+      --claude-soft: #231C1A;
       color-scheme: dark;
     }
   }
   :root[data-theme="dark"] {
-    --bg: #12151C;
-    --ink: #ECEEF2;
-    --muted: #9AA1AE;
-    --line: #272C38;
-    --link: #9AA8FF;
-    --shipped: #4CC985;
-    --building: #F0B34A;
+    --bg: #0F0F10;
+    --ink: #EDEDEF;
+    --muted: #909096;
+    --line: #2A2A2D;
+    --link: #A9B3F5;
+    --shipped: #6CBF8F;
+    --building: #D9A757;
+    --claude-soft: #231C1A;
     color-scheme: dark;
   }
 
@@ -339,16 +339,21 @@
   .spark-cap { margin-top: 0.375rem; font-size: 0.8125rem; color: var(--muted); font-variant-numeric: tabular-nums; }
   .stats-source { grid-column: 1 / -1; padding-top: 0.75rem; border-top: 1px solid var(--line); font-size: 0.8125rem; color: var(--muted); }
 
-  /* ---------- Hire block: the one loud thing on the page ---------- */
+  /* ---------- Hire block: a quiet card; the headline does the work, not the colour ---------- */
+  :root { --card: #FFFFFF; }
+  :root[data-theme="dark"] { --card: #18181A; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --card: #18181A; } }
   .hire {
     margin: 0.5rem 0 2.5rem;
     padding: 2.25rem 1.75rem;
-    border: 0;
+    border: 1px solid var(--line);
     border-radius: 1.25rem;
-    background: var(--accent);
-    color: var(--on-accent);
+    background: var(--card);
+    color: var(--ink);
+    transition: border-color 0.25s var(--ease);
   }
-  .hire h2 { color: var(--on-accent); opacity: 0.8; }
+  .hire:hover { border-color: color-mix(in srgb, var(--muted) 45%, var(--line)); }
+  .hire h2 { color: var(--muted); }
   .hire .pitch {
     font-family: var(--display);
     font-weight: 600;
@@ -373,14 +378,13 @@
     display: inline-block;
     padding: 0.75rem 1.25rem;
     border-radius: 999px;
-    background: var(--on-accent);
-    color: var(--accent);
+    background: var(--ink);
+    color: var(--bg);
     text-decoration: none;
-    transition: transform 0.15s var(--ease);
+    transition: transform 0.15s var(--ease), opacity 0.15s var(--ease);
   }
-  .hire .btn:hover { transform: translateY(-1px); }
-  .hire a:not(.btn) { color: var(--on-accent); }
-  .hire a:focus-visible { outline-color: var(--on-accent); }
+  .hire .btn:hover { transform: translateY(-1px); opacity: 0.9; }
+  .hire a:not(.btn) { color: var(--link); }
 
   /* ---------- Footer ---------- */
   footer.site-foot {
@@ -393,24 +397,51 @@
   .site-foot .foot-name { color: var(--ink); font-weight: 600; font-size: 1.0625rem; letter-spacing: -0.01em; }
   .site-foot .foot-tag { margin-top: 0.875rem; max-width: 18rem; font-size: 0.9375rem; line-height: 1.5; color: var(--muted); }
   .foot-social { list-style: none; display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0; padding: 0; }
+  /* Social pills: on hover ink rises from the bottom like liquid, the label rolls up and a small arrow slides in */
   .foot-social a {
-    display: inline-block; padding: 0.4375rem 0.875rem; border: 1px solid var(--line); border-radius: 999px;
+    position: relative; isolation: isolate; overflow: hidden;
+    display: inline-flex; align-items: center; padding: 0.4375rem 0.875rem; border: 1px solid var(--line); border-radius: 999px;
     color: var(--ink); font-size: 0.875rem; font-weight: 500; text-decoration: none;
-    transition: border-color 0.15s var(--ease);
+    transition: border-color 0.3s var(--ease), color 0.35s var(--ease), transform 0.5s cubic-bezier(.34, 1.4, .5, 1);
+    -webkit-tap-highlight-color: transparent;
   }
-  .foot-social a:hover { border-color: var(--muted); }
+  .foot-social a::before {
+    content: ""; position: absolute; inset: -1px; z-index: -1; border-radius: inherit; background: var(--ink);
+    clip-path: circle(0% at 50% 120%);
+    transition: clip-path 0.5s cubic-bezier(.4, 0, .2, 1);
+  }
+  .foot-social .sl { display: inline-block; overflow: hidden; height: 1.25em; line-height: 1.25em; }
+  .foot-social .sl > span { display: block; transition: transform 0.55s cubic-bezier(.34, 1.3, .5, 1); }
+  .foot-social .sl > span::after { content: attr(data-t); display: block; }
+  .foot-social .sa {
+    display: inline-block; max-width: 0; margin-left: 0; opacity: 0; transform: translate(-0.25rem, 0.25rem) scale(0.6);
+    font-size: 0.8125rem; line-height: 1; overflow: hidden;
+    transition: max-width 0.5s cubic-bezier(.34, 1.3, .5, 1), margin 0.5s cubic-bezier(.34, 1.3, .5, 1), opacity 0.25s var(--ease), transform 0.5s cubic-bezier(.34, 1.4, .5, 1);
+  }
+  @media (hover: hover) {
+    .foot-social a:hover { color: var(--bg); border-color: var(--ink); transform: translateY(-2px); }
+    .foot-social a:hover::before { clip-path: circle(150% at 50% 120%); }
+    .foot-social a:hover .sl > span { transform: translateY(-1.25em); }
+    .foot-social a:hover .sa { max-width: 1em; margin-left: 0.3125rem; opacity: 1; transform: none; transition-delay: 0.05s; }
+  }
+  .foot-social a:focus-visible { outline: 2px solid var(--link); outline-offset: 3px; }
+  .foot-social a:active { transform: scale(0.95); }
   .foot-legal { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.25rem 1rem; margin-top: 2.25rem; padding-top: 1.25rem; border-top: 1px solid var(--line); font-size: 0.8125rem; color: var(--muted); }
   .foot-legal a { color: var(--muted); }
   @media (min-width: 36rem) {
     .foot-main { grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 2rem; }
     .foot-social { justify-content: flex-end; }
   }
-  @media (prefers-reduced-motion: reduce) { .foot-social a { transition: none; } }
+  @media (prefers-reduced-motion: reduce) {
+    .foot-social a, .foot-social a::before, .foot-social .sl > span, .foot-social .sa { transition: none !important; }
+    .foot-social a:hover, .foot-social a:active { transform: none !important; }
+    .foot-social a:hover .sl > span { transform: none !important; }
+  }
 
   /* ---------- Top nav: profile on the left, progress circle on the right ---------- */
   :root { --glass: rgba(255, 255, 255, 0.72); }
-  :root[data-theme="dark"] { --glass: rgba(26, 30, 39, 0.72); }
-  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --glass: rgba(26, 30, 39, 0.72); } }
+  :root[data-theme="dark"] { --glass: rgba(26, 26, 28, 0.72); }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --glass: rgba(26, 26, 28, 0.72); } }
   .page { padding-top: 5rem; }
   main section, main h2[id], #hello { scroll-margin-top: 5.5rem; }
   .pnav {
@@ -499,8 +530,8 @@
 
   /* ---------- Liquid merge: both pills share one gooey background layer ---------- */
   :root { --pill: #FFFFFF; }
-  :root[data-theme="dark"] { --pill: #1C2029; }
-  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --pill: #1C2029; } }
+  :root[data-theme="dark"] { --pill: #1A1A1C; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --pill: #1A1A1C; } }
   .goo-defs { position: absolute; width: 0; height: 0; }
   .pnav .goo {
     position: absolute; inset: 0; z-index: 0; pointer-events: none;
@@ -800,15 +831,19 @@
   .goal-mini {
     display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 1rem;
     margin-top: 2rem; padding: 1rem 1.125rem; border-radius: 1.125rem;
-    background: var(--claude-soft); border: 1px solid color-mix(in srgb, var(--claude) 28%, transparent);
+    background: var(--card); border: 1px solid var(--line);
     color: var(--ink); text-decoration: none; font-family: var(--display);
-    transition: border-color 0.2s var(--ease), transform 0.2s var(--ease);
+    transition: border-color 0.3s var(--ease), background-color 0.3s var(--ease), transform 0.3s var(--ease);
   }
-  .goal-mini:hover { border-color: var(--claude); transform: translateY(-1px); }
-  .goal-mini:hover .gm-cta { background: #A84A2B; }
+  /* at rest it matches the hire card; on hover (or tap / keyboard focus) it warms up to Claude orange */
+  .goal-mini:hover, .goal-mini:focus-visible, .goal-mini:active {
+    background: var(--claude-soft); border-color: color-mix(in srgb, var(--claude) 55%, transparent); transform: translateY(-1px);
+  }
+  .goal-mini:hover .gm-cta, .goal-mini:focus-visible .gm-cta, .goal-mini:active .gm-cta { background: #B85433; border-color: #B85433; color: #FFFFFF; }
   .goal-mini:focus-visible { outline: 2px solid var(--claude); outline-offset: 3px; }
   .gm-spark { width: 2.75rem; height: 2.75rem; overflow: visible; }
-  .gm-glow { fill: var(--claude); opacity: 0.16; }
+  .gm-glow { fill: var(--claude); opacity: 0; transition: opacity 0.3s var(--ease); }
+  .goal-mini:hover .gm-glow, .goal-mini:focus-visible .gm-glow { opacity: 0.16; }
   .gm-star { fill: var(--claude); transform-origin: 50px 50px; transform-box: view-box; }
   @media (prefers-reduced-motion: no-preference) {
     .gm-star { animation: gm-spin var(--gm-speed, 14s) linear infinite; }
@@ -821,14 +856,16 @@
   .gm-bar i { position: absolute; inset: 0 auto 0 0; width: 0; border-radius: 999px; background: var(--claude); transition: width 1s var(--ease); }
   .gm-v { font-size: 0.8125rem; color: var(--muted); font-variant-numeric: tabular-nums; }
   .gm-cta {
-    padding: 0.5625rem 1rem; border-radius: 999px; background: #B85433; color: #FFFFFF;
+    padding: 0.5rem 0.9375rem; border-radius: 999px; background: transparent; color: var(--ink);
+    border: 1px solid color-mix(in srgb, var(--muted) 45%, var(--line));
     font-size: 0.875rem; font-weight: 600; white-space: nowrap;
+    transition: background-color 0.3s var(--ease), border-color 0.3s var(--ease), color 0.3s var(--ease);
   }
   @media (max-width: 26rem) {
     .goal-mini { grid-template-columns: auto minmax(0, 1fr); }
     .gm-cta { grid-column: 1 / -1; text-align: center; }
   }
-  @media (prefers-reduced-motion: reduce) { .goal-mini, .gm-bar i { transition: none; } }
+  @media (prefers-reduced-motion: reduce) { .goal-mini, .gm-bar i, .gm-cta, .gm-glow, .hire { transition: none; } .goal-mini:hover { transform: none; } }
 
   /* ---------- One load moment, hero only ---------- */
   @media (prefers-reduced-motion: no-preference) {
@@ -954,10 +991,10 @@
         <p class="foot-tag">Product designer by trade, builder by habit.</p>
       </div>
       <ul class="foot-social" aria-label="Elsewhere">
-          <li><a href="https://x.com/Rahul_gaikarr" target="_blank" rel="me noopener">X</a></li>
-          <li><a href="https://www.youtube.com/channel/UCVfpFBvmImwj84qx-8jCxIA" target="_blank" rel="me noopener">YouTube</a></li>
-          <li><a href="https://www.instagram.com/rahul_uxd/" target="_blank" rel="me noopener">Instagram</a></li>
-          <li><a href="https://github.com/Rahul-Gaikar" target="_blank" rel="me noopener">GitHub</a></li>
+          <li><a href="https://x.com/Rahul_gaikarr" target="_blank" rel="me noopener" aria-label="X"><span class="sl"><span data-t="X">X</span></span><span class="sa" aria-hidden="true">&nearr;</span></a></li>
+          <li><a href="https://www.youtube.com/channel/UCVfpFBvmImwj84qx-8jCxIA" target="_blank" rel="me noopener" aria-label="YouTube"><span class="sl"><span data-t="YouTube">YouTube</span></span><span class="sa" aria-hidden="true">&nearr;</span></a></li>
+          <li><a href="https://www.instagram.com/rahul_uxd/" target="_blank" rel="me noopener" aria-label="Instagram"><span class="sl"><span data-t="Instagram">Instagram</span></span><span class="sa" aria-hidden="true">&nearr;</span></a></li>
+          <li><a href="https://github.com/Rahul-Gaikar" target="_blank" rel="me noopener" aria-label="GitHub"><span class="sl"><span data-t="GitHub">GitHub</span></span><span class="sa" aria-hidden="true">&nearr;</span></a></li>
       </ul>
     </div>
     <p class="foot-legal"><span>© 2026 Rahul Gaikar</span><span>Updated <span id="updated"></span></span></p>
@@ -973,7 +1010,7 @@
    block only. Status can be: "shipped", "live", "building", "next".
    ===================================================================== */
 const SITE = {
-  updated: "22 Nov 2026",
+  updated: "25 Nov 2026",
 
   intro: "I’m Rahul, a product designer who also builds. Two years of interaction and motion work, and now real apps made with AI-assisted coding. Everything I ship ends up here.",
 
@@ -1037,6 +1074,7 @@ const SITE = {
       text: "A focus timer built around one gesture. Flip your phone face-down to start, watch the sand fall, flip it back for a break. Android, fully offline, no account.",
       note: "Built with AI-assisted coding. A 3D version is in the works (see Building now).",
       links: [
+        { label: "Visit the website", url: "https://hourglassflip.framer.website" },
         { label: "Download the APK", url: "https://github.com/Rahul-Gaikar/Hourglass/releases/download/v1.0/app-debug.apk" },
         { label: "View on GitHub", url: "https://github.com/Rahul-Gaikar/Hourglass" }
       ]

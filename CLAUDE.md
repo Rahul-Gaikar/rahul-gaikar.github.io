@@ -34,7 +34,7 @@ Rahul is a product designer, not a developer. Talk to him in plain words, show c
 
 ## Design rules
 
-- Colours: background `#F4F5F7`, ink `#14161A`, cobalt accent `#2B44FF` (links, the "Motion for hire" block), green `#1B8F4D` = shipped/live, amber `#C77A00` = building. Dark mode has its own token values in `:root`.
+- Colours: background `#F4F5F7`, ink `#14161A`, cobalt accent `#2B44FF` (links). On `v2`, "Motion for hire" and the Claude-goal card are quiet neutral cards (`--card`); the Claude card warms to orange only on hover/tap. v2 dark theme is neutral charcoal (`#0F0F10`), not navy, green `#1B8F4D` = shipped/live, amber `#C77A00` = building. Dark mode has its own token values in `:root`.
 - **Claude orange `#D97757`** is used **only** for support/Claude-goal elements. Use the deeper `#B85433` behind white text so it stays readable.
 - Fonts: headings Bricolage Grotesque, body Newsreader (Google Fonts).
 - Motion: calm and springy, always respecting `prefers-reduced-motion`.
