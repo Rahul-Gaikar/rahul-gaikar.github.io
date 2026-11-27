@@ -200,7 +200,8 @@
     opacity: 0; scale: 0.92; transition: opacity 0.2s var(--ease), scale 0.3s var(--ease);
   }
   .peek.is-on { opacity: 1; scale: 1; }
-  .peek img, .peek video { display: block; width: 100%; height: auto; }
+  .peek img, .peek video { display: block; width: 100%; height: auto; aspect-ratio: 16 / 10; object-fit: cover; object-position: top; }
+  .p-desc { display: none; }
   @media (max-width: 26rem) { .p-kind { display: none; } }
   @media (prefers-reduced-motion: reduce) { .p-name, .plus, .plus::before, .plus::after, .peek { transition: none; } .project details[open] .p-body { animation: none; } }
   .project-head {
@@ -891,7 +892,7 @@
   .side-id, .side-menu, .side-bottom { display: none; }
   .side-main { display: contents; }
   @media (min-width: 60rem) {
-    :root { --side: 36%; --sgap: 4rem; }
+    :root { --side: 34%; --sgap: 3.5rem; }
     .page { max-width: 80rem; padding: 0 2.5rem; }
     .pnav { display: none; }
     main { display: grid; grid-template-columns: var(--side) minmax(0, 1fr); column-gap: var(--sgap); align-items: start; }
@@ -912,7 +913,7 @@
     .side-id { display: inline-flex; align-items: center; gap: 0.625rem; align-self: flex-start; color: var(--ink); text-decoration: none; font-family: var(--display); font-weight: 600; font-size: 0.9375rem; letter-spacing: -0.01em; }
     .side-id .avatar { width: 2.25rem; height: 2.25rem; }
     .side-main { display: block; margin-top: auto; }
-    .hero h1 { font-size: clamp(2.5rem, 3.6vw, 3.5rem); margin-bottom: 1.25rem; }
+    .hero h1 { font-size: clamp(2.25rem, 3.4vw, 2.875rem); margin-bottom: 1.125rem; }
     .hero .intro { font-size: 1.0625rem; max-width: 26rem; }
     .hero .now { margin-top: 1.25rem; }
 
@@ -931,11 +932,41 @@
     .side-social a { color: var(--muted); text-decoration: none; }
     .side-social a:hover { color: var(--ink); text-decoration: underline; }
     .side-goal:empty { display: none; }
+
+    /* Work as one index: Building now + Things I've built become quiet rows */
+    .nb-list { gap: 0; border-top: 1px solid var(--line); }
+    .nb-card { border: 0; border-bottom: 1px solid var(--line); border-radius: 0; background: none; padding: 0; overflow: visible; }
+    .now-building { padding-bottom: 0.5rem; }
+    .now-building:not([hidden]) + section { border-top: 0; padding-top: 1.75rem; }
+    .project summary, .nb-card summary {
+      grid-template-columns: auto minmax(0, 1fr) 6.5rem auto; column-gap: 1.25rem;
+      padding: 1rem 0.625rem; border-radius: 0.625rem;
+      transition: background-color 0.25s var(--ease), padding 0.35s cubic-bezier(.34, 1.3, .5, 1);
+    }
+    .project summary:hover, .nb-card summary:hover { background: color-mix(in srgb, var(--ink) 4%, transparent); padding-left: 1rem; }
+    .project summary:hover .p-name, .nb-card summary:hover .p-name { transform: none; }
+    .p-title { flex-wrap: nowrap; }
+    .p-desc { display: block; min-width: 0; font-family: var(--body); font-size: 1rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: color 0.25s var(--ease); }
+    summary:hover .p-desc { color: var(--ink); }
+    details[open] > summary .p-desc { opacity: 0; }
+    .project .p-kind, .nb-card .p-kind { display: none; }
+    .project .status, .nb-card .status { justify-self: start; font-size: 0.8125rem; }
+    .project .p-body, .nb-card .p-body { padding-left: 0.625rem; padding-right: 0.625rem; }
+    #background { max-width: 34rem; }
+    .peek { width: 18rem; border: 1px solid var(--line); background: var(--card); }
     .side-goal .goal-mini { margin: 0; }
   }
+  /* Smaller laptops: the one-line description drops under the name instead of being cut short */
+  @media (min-width: 60rem) and (max-width: 74.99rem) {
+    .project summary, .nb-card summary { grid-template-columns: minmax(0, 1fr) 6rem auto; row-gap: 0.125rem; }
+    .project summary .p-title, .nb-card summary .p-title { grid-column: 1; grid-row: 1; }
+    .project summary .p-desc, .nb-card summary .p-desc { grid-column: 1; grid-row: 2; white-space: normal; font-size: 0.9375rem; }
+    .project summary .status, .nb-card summary .status { grid-column: 2; grid-row: 1 / span 2; }
+    .project summary .plus, .nb-card summary .plus { grid-column: 3; grid-row: 1 / span 2; }
+  }
   @media (min-width: 75rem) {
-    :root { --side: 40%; --sgap: 5rem; }
-    .hero h1 { font-size: clamp(3.25rem, 3.8vw, 4rem); }
+    :root { --side: 30%; --sgap: 4.5rem; }
+    .hero h1 { font-size: clamp(2.75rem, 3.3vw, 3.375rem); }
   }
   @media (min-width: 60rem) and (max-height: 46rem) {
     main > .hero { gap: 1.25rem; padding: 1.5rem 0 1.25rem; }
@@ -943,7 +974,7 @@
     .hero .now { margin-top: 0.875rem; }
   }
   @media (min-width: 60rem) and (prefers-reduced-motion: reduce) {
-    .side-menu a, .side-menu a::before { transition: none; }
+    .side-menu a, .side-menu a::before, .project summary, .nb-card summary { transition: none; }
   }
 </style>
 </head>
@@ -999,7 +1030,6 @@
       </div>
       <nav class="side-menu" aria-label="Sections"><ol id="side-menu"></ol></nav>
       <div class="side-bottom">
-        <div class="side-goal" id="side-goal"></div>
         <div class="side-foot">
           <ul class="side-social" aria-label="Elsewhere">
             <li><a href="https://x.com/Rahul_gaikarr" target="_blank" rel="me noopener">X</a></li>
@@ -1101,6 +1131,7 @@ const SITE = {
   building: [
     {
       name: "Hourglass 3D",
+      short: "The focus timer, rebuilt as a 3D hourglass for iPhone",
       label: "Building",
       text: "The focus timer, rebuilt as a 3D hourglass for iPhone. Flip to focus and watch the sand fall.",
       credit: "Building with a co-founder on design and engineering",
@@ -1116,6 +1147,8 @@ const SITE = {
     },
     {
       name: "Hatchwise",
+      short: "See your breeding odds before you spend 5,000 gold",
+      media: { type: "image", src: "media/hatchwise.jpg", alt: "Hatchwise breeding calculator" },
       label: "Building",
       text: "See your odds before you spend 5,000 gold. A Miscrits breeding calculator that reads your screenshots: your S+ chance, which stats come out green, white or red, and the gold it will cost. Fan-made, not affiliated with the game.",
       credit: "Designed by me, built with Claude Code",
@@ -1133,6 +1166,7 @@ const SITE = {
   projects: [
     {
       name: "Glowfinder",
+      short: "A crowdsourced radar for rare, time-limited spawns",
       kind: "App",
       badge: "New",
       status: "live",
@@ -1159,6 +1193,7 @@ const SITE = {
     },
     {
       name: "Hourglass",
+      short: "A focus timer you flip, not tap. Fully offline",
       kind: "Android app",
       status: "shipped",
       statusLabel: "Shipped",
@@ -1172,6 +1207,8 @@ const SITE = {
     },
     {
       name: "Orbito 3D",
+      short: "A two-player board game where the board shifts under you",
+      media: { type: "image", src: "media/orbito-3d.jpg", alt: "Orbito 3D game board" },
       kind: "Game",
       status: "live",
       statusLabel: "Live",
@@ -1183,6 +1220,7 @@ const SITE = {
     },
     {
       name: "Bucket List",
+      short: "A Notion template for the things you want to buy, learn and do",
       kind: "Notion template",
       status: "live",
       statusLabel: "Live",
@@ -1329,6 +1367,8 @@ const SITE = {
       const sum = document.createElement("summary");
       const title = el("span", "p-title"); title.appendChild(el("span", "p-name", b.name));
       sum.appendChild(title);
+      if (b.short) sum.appendChild(el("span", "p-desc", b.short));
+      if (b.media) det.dataset.media = "b" + i;
       const st = el("span", "status", b.label || "Building"); st.dataset.status = "building";
       sum.appendChild(st);
       if (b.kind) sum.appendChild(el("span", "p-kind", b.kind));
@@ -1337,6 +1377,7 @@ const SITE = {
       det.appendChild(sum);
 
       const body = el("div", "p-body");
+      if (b.media) body.appendChild(mediaEl(b.media, "p-media"));
       if (b.text) body.appendChild(el("p", "nb-text", b.text));
 
       // stats: milestones + waitlist (only what's filled in)
@@ -1388,13 +1429,14 @@ const SITE = {
     const li = el("li", "project");
     const det = document.createElement("details");
     if (i === 0) det.open = true;
-    if (p.media) det.dataset.media = i;
+    if (p.media) det.dataset.media = "p" + i;
 
     const sum = document.createElement("summary");
     const title = el("span", "p-title");
     title.appendChild(el("span", "p-name", p.name));
     if (p.badge) title.appendChild(el("span", "badge", p.badge));
     sum.appendChild(title);
+    if (p.short) sum.appendChild(el("span", "p-desc", p.short));
     const status = el("span", "status", p.statusLabel);
     status.dataset.status = p.status;
     sum.appendChild(status);
@@ -1497,7 +1539,8 @@ const SITE = {
 
   // Laptops: floating preview that follows the cursor over a row
   const canHover = matchMedia("(hover: hover) and (pointer: fine)").matches;
-  if (canHover && SITE.projects.some((p) => p.media)) {
+  const mediaFor = (k) => (k[0] === "b" ? SITE.building : SITE.projects)[+k.slice(1)].media;
+  if (canHover && [...SITE.projects, ...(SITE.building || [])].some((p) => p.media)) {
     const peek = el("div", "peek"); peek.setAttribute("aria-hidden", "true");
     document.body.appendChild(peek);
     const cache = {};
@@ -1508,10 +1551,10 @@ const SITE = {
       peek.style.transform = "translate(" + x.toFixed(1) + "px," + y.toFixed(1) + "px)";
       raf = requestAnimationFrame(loop);
     };
-    list.querySelectorAll("details[data-media] > summary").forEach((sum) => {
+    document.querySelectorAll("details[data-media] > summary").forEach((sum) => {
       const idx = sum.parentElement.dataset.media;
       sum.addEventListener("pointerenter", (e) => {
-        if (!cache[idx]) cache[idx] = mediaEl(SITE.projects[idx].media, "peek-media");
+        if (!cache[idx]) cache[idx] = mediaEl(mediaFor(idx), "peek-media");
         if (current) pauseIn(current);
         peek.replaceChildren(cache[idx]); current = cache[idx]; playIn(current);
         tx = x = e.clientX + 24; ty = y = e.clientY - 90;
@@ -1766,47 +1809,42 @@ const SITE = {
   check();
 })();
 
-/* ---------- Split screen: section menu, Claude card placement, short screens ---------- */
+/* ---------- Split screen: section menu and short screens ---------- */
 (function () {
   const main = document.querySelector("main");
   const side = document.getElementById("side");
   const list = document.getElementById("side-menu");
-  const slot = document.getElementById("side-goal");
-  const goal = document.getElementById("goal-mini");
-  const home = goal ? goal.parentElement : null, homeNext = goal ? goal.nextSibling : null;
-  const split = matchMedia("(min-width: 60rem)"), big = matchMedia("(min-width: 75rem)");
+  const split = matchMedia("(min-width: 60rem)");
   const sections = [...document.querySelectorAll("main > section")].filter((s) => !s.hidden && s.querySelector("h2"));
-  const links = sections.map((s, i) => {
+  // "Building now" and "Things I've built" share one menu item: Work
+  const isWork = (s) => s.id === "now-building" || !!s.querySelector("#built");
+  const groups = [];
+  sections.forEach((s) => {
     const h = s.querySelector("h2");
-    if (!h.id) h.id = "sec-" + i;
+    const g = isWork(s) && groups.find((x) => x.work);
+    if (g) { g.secs.push(s); return; }
+    groups.push({ work: isWork(s), secs: [s], label: isWork(s) ? "Work" : h.textContent.trim(), href: "#" + (s.id || h.id) });
+  });
+  const links = groups.map((g, i) => {
     const li = document.createElement("li"), a = document.createElement("a");
-    a.href = "#" + (s.id || h.id);
+    a.href = g.href;
     const n = document.createElement("small"); n.textContent = String(i + 1).padStart(2, "0");
-    a.append(n, h.textContent.trim());
+    a.append(n, g.label);
     li.appendChild(a); list.appendChild(li);
     return a;
   });
-  // Claude card: left panel on big screens, back under "Say hello" otherwise
-  const place = () => {
-    if (!goal) return;
-    if (split.matches && big.matches) { if (goal.parentElement !== slot) slot.appendChild(goal); }
-    else if (goal.parentElement !== home) home.insertBefore(goal, homeNext);
-  };
   // If the left panel can't fit the screen height, let it scroll with the page instead
-  // Short screens: first move the Claude card to the right, then (if still too tall) let it scroll
   const fit = () => {
     main.classList.remove("side-free");
-    if (!split.matches) return;
-    if (side.scrollHeight > innerHeight + 1 && goal && goal.parentElement === slot) home.insertBefore(goal, homeNext);
-    if (side.scrollHeight > innerHeight + 1) main.classList.add("side-free");
+    if (split.matches && side.scrollHeight > innerHeight + 1) main.classList.add("side-free");
   };
   let ticking = false;
   const mark = () => {
     ticking = false;
     if (!split.matches) return;
     let cur = -1;
-    sections.forEach((s, i) => { if (s.getBoundingClientRect().top < innerHeight * 0.4) cur = i; });
-    if (innerHeight + scrollY >= document.documentElement.scrollHeight - 4) cur = sections.length - 1;
+    groups.forEach((g, i) => { if (g.secs[0].getBoundingClientRect().top < innerHeight * 0.4) cur = i; });
+    if (innerHeight + scrollY >= document.documentElement.scrollHeight - 4) cur = groups.length - 1;
     links.forEach((a, i) => { a.classList.toggle("on", i === cur); if (i === cur) a.setAttribute("aria-current", "true"); else a.removeAttribute("aria-current"); });
   };
   // Footer joins the right column so the left panel stays put to the very end
@@ -1816,10 +1854,12 @@ const SITE = {
     if (split.matches) { if (foot.parentElement !== main) main.appendChild(foot); }
     else if (foot.parentElement === main) main.after(foot);
   };
-  const all = () => { moveFoot(); place(); fit(); mark(); };
+  // On the index every row starts closed, so the list reads at a glance
+  if (split.matches) document.querySelectorAll("#nb-list details[open], #projects details[open]").forEach((d) => { d.open = false; });
+  const all = () => { moveFoot(); fit(); mark(); };
   addEventListener("scroll", () => { if (!ticking) { ticking = true; requestAnimationFrame(mark); } }, { passive: true });
   addEventListener("resize", all);
-  split.addEventListener("change", all); big.addEventListener("change", all);
+  split.addEventListener("change", all);
   all();
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
 })();
